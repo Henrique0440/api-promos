@@ -1,11 +1,11 @@
 {
-    "name": "whatsapp-loja-api",
+    "name": "api-promos",
     "version": "1.0.0",
-    "description": "API para puxar gastos e categorias de uma loja via WhatsApp",
+    "description": "API para puxar dados",
     "main": "index.js",
     "scripts": {
         "dev": "vercel dev",
-        "start": "node api/gastos.js"
+        "start": "node api/produtos.js"
     },
     "dependencies": {
         "dotenv": "^16.0.0",
@@ -25,3 +25,4 @@
     "author": "Henrique0440",
     "license": "MIT"
 }
+
