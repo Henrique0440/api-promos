@@ -1,0 +1,27 @@
+{
+    "name": "whatsapp-loja-api",
+    "version": "1.0.0",
+    "description": "API para puxar gastos e categorias de uma loja via WhatsApp",
+    "main": "index.js",
+    "scripts": {
+        "dev": "vercel dev",
+        "start": "node api/gastos.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.0",
+        "jsonwebtoken": "^9.0.0",
+        "mongodb": "^6.21.0"
+    },
+    "engines": {
+        "node": "20.x"
+    },
+    "keywords": [
+        "whatsapp",
+        "api",
+        "vercel",
+        "mongodb",
+        "jwt"
+    ],
+    "author": "Henrique0440",
+    "license": "MIT"
+}
