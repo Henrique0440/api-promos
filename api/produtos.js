@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { connectPernalongaBot } from "../scripts/database.js";
 
 export default async function handler(req, res) {
@@ -12,18 +13,26 @@ export default async function handler(req, res) {
 
   const db = await connectPernalongaBot();
   const produtos = db.collection("produtos");
+  const users = db.collection("users");
+
+  // 🔐 TOKEN OBRIGATÓRIO
+  const { t } = req.query;
+
+  if (!t) {
+    return res.status(401).json({ error: "Token não informado" });
+  }
+
+  const user = await users.findOne({ token: t });
+
+  if (!user) {
+    return res.status(401).json({ error: "Token inválido" });
+  }
 
   // 🔹 LISTAR PRODUTOS
   if (req.method === "GET") {
-    const { user } = req.query;
-
-    if (!user) {
-      return res.status(400).json({ error: "user é obrigatório" });
-    }
-
     const data = await produtos
-      .find({ userNumber: user })
-      .sort({ dataCadastro: -1 })
+      .find({ userId: user._id })
+      .sort({ createdAt: -1 })
       .toArray();
 
     return res.status(200).json(data);
@@ -31,11 +40,11 @@ export default async function handler(req, res) {
 
   // 🔹 EDITAR PRODUTO
   if (req.method === "PUT") {
-    const { idProduto } = req.query;
+    const { id } = req.query;
     const { nome, preco, desconto, link, imagem } = req.body;
 
-    if (!idProduto) {
-      return res.status(400).json({ error: "idProduto é obrigatório" });
+    if (!id || !ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
     }
 
     const update = {};
@@ -45,23 +54,34 @@ export default async function handler(req, res) {
     if (link !== undefined) update.link = link;
     if (imagem !== undefined) update.imagem = imagem;
 
-    await produtos.updateOne(
-      { idProduto },
+    const result = await produtos.updateOne(
+      { _id: new ObjectId(id), userId: user._id },
       { $set: update }
     );
+
+    if (!result.matchedCount) {
+      return res.status(404).json({ error: "Produto não encontrado" });
+    }
 
     return res.status(200).json({ success: true });
   }
 
   // 🔹 DELETAR PRODUTO
   if (req.method === "DELETE") {
-    const { idProduto } = req.query;
+    const { id } = req.query;
 
-    if (!idProduto) {
-      return res.status(400).json({ error: "idProduto é obrigatório" });
+    if (!id || !ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
     }
 
-    await produtos.deleteOne({ idProduto });
+    const result = await produtos.deleteOne({
+      _id: new ObjectId(id),
+      userId: user._id
+    });
+
+    if (!result.deletedCount) {
+      return res.status(404).json({ error: "Produto não encontrado" });
+    }
 
     return res.status(200).json({ success: true });
   }
