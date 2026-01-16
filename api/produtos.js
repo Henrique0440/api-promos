@@ -4,7 +4,7 @@ import { connectPernalongaBot } from "../scripts/database.js";
 export default async function handler(req, res) {
   // 🔹 CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -36,6 +36,30 @@ export default async function handler(req, res) {
       .toArray();
 
     return res.status(200).json(data);
+  }
+
+  // 🔹 CRIAR PRODUTO
+  if (req.method === "POST") {
+    const { nome, preco, desconto, link, imagem } = req.body;
+
+    if (!nome || !link) {
+      return res.status(400).json({ error: "Nome e link são obrigatórios" });
+    }
+
+    await produtos.insertOne({
+      nome,
+      preco: preco || null,
+      desconto: desconto || null,
+      link,
+      imagem: imagem || null,
+
+      userId: user._id,
+      userName: user.userName || user.nome || "Usuário",
+
+      createdAt: new Date()
+    });
+
+    return res.status(201).json({ success: true });
   }
 
   // 🔹 EDITAR PRODUTO
