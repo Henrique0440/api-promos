@@ -1,5 +1,5 @@
 import axios from "axios";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 export async function getProdutoInfo(url) {
   try {
@@ -75,3 +75,4 @@ export async function getProdutoInfo(url) {
     return null;
   }
 }
+
