@@ -1,19 +1,21 @@
 {
-    "name": "api-promos",
+    "name": "whatsapp-loja-api",
     "version": "1.0.0",
-    "description": "API para puxar dados",
+    "description": "API para puxar gastos e categorias de uma loja via WhatsApp",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "dev": "vercel dev",
-        "start": "node api/produtos.js"
+        "start": "node api/gastos.js"
     },
     "dependencies": {
+        "axios": "^1.13.2",
         "dotenv": "^16.0.0",
         "jsonwebtoken": "^9.0.0",
         "mongodb": "^6.21.0"
     },
     "engines": {
-        "node": "20.x"
+        "node": "24.x"
     },
     "keywords": [
         "whatsapp",
@@ -25,4 +27,3 @@
     "author": "Henrique0440",
     "license": "MIT"
 }
-
