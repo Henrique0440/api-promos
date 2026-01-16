@@ -1,4 +1,4 @@
-import { getProdutoInfo } from "../scripts/buscarprodutos.js";
+const { getProdutoInfo } = require("../scripts/buscarprodutos.js");
 
 export default async function handler(req, res) {
   // 🔹 CORS
