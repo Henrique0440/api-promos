@@ -14,7 +14,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
-  const { url } = req.query;
+  const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+  const url = fullUrl.searchParams.get("url");
 
   if (!url) {
     return res.status(400).json({ error: "URL não informada" });
