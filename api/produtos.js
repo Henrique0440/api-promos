@@ -4,23 +4,26 @@ import { connectPernalongaBot } from "../scripts/database.js";
 export default async function handler(req, res) {
   // 🔹 CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  const db = await connectPernalongaBot();
-  const produtos = db.collection("produtos");
-  const users = db.collection("users");
-
-  // 🔐 TOKEN OBRIGATÓRIO
-  const { t } = req.query;
+  const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+  const t = fullUrl.searchParams.get("t");
 
   if (!t) {
     return res.status(401).json({ error: "Token não informado" });
   }
+
+  const db = await connectPernalongaBot();
+  const produtos = db.collection("produtos");
+  const users = db.collection("users");
 
   const user = await users.findOne({ token: t });
 
@@ -43,7 +46,9 @@ export default async function handler(req, res) {
     const { nome, preco, desconto, link, imagem } = req.body;
 
     if (!nome || !link) {
-      return res.status(400).json({ error: "Nome e link são obrigatórios" });
+      return res
+        .status(400)
+        .json({ error: "Nome e link são obrigatórios" });
     }
 
     await produtos.insertOne({
@@ -64,12 +69,13 @@ export default async function handler(req, res) {
 
   // 🔹 EDITAR PRODUTO
   if (req.method === "PUT") {
-    const { id } = req.query;
-    const { nome, preco, desconto, link, imagem } = req.body;
+    const id = fullUrl.searchParams.get("id");
 
     if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({ error: "ID inválido" });
     }
+
+    const { nome, preco, desconto, link, imagem } = req.body;
 
     const update = {};
     if (nome !== undefined) update.nome = nome;
@@ -84,7 +90,9 @@ export default async function handler(req, res) {
     );
 
     if (!result.matchedCount) {
-      return res.status(404).json({ error: "Produto não encontrado" });
+      return res
+        .status(404)
+        .json({ error: "Produto não encontrado" });
     }
 
     return res.status(200).json({ success: true });
@@ -92,7 +100,7 @@ export default async function handler(req, res) {
 
   // 🔹 DELETAR PRODUTO
   if (req.method === "DELETE") {
-    const { id } = req.query;
+    const id = fullUrl.searchParams.get("id");
 
     if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({ error: "ID inválido" });
@@ -104,7 +112,9 @@ export default async function handler(req, res) {
     });
 
     if (!result.deletedCount) {
-      return res.status(404).json({ error: "Produto não encontrado" });
+      return res
+        .status(404)
+        .json({ error: "Produto não encontrado" });
     }
 
     return res.status(200).json({ success: true });
