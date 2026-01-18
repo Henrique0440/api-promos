@@ -14,6 +14,7 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
+  // 🔹 URL moderna (remove warning DEP0169)
   const fullUrl = new URL(req.url, `http://${req.headers.host}`);
   const t = fullUrl.searchParams.get("t");
 
@@ -59,7 +60,12 @@ export default async function handler(req, res) {
       imagem: imagem || null,
 
       userId: user._id,
-      userName: user.userName || user.nome || "Usuário",
+      userName: user.name || "Usuário",
+      
+      createdBy: {
+        name: user.name || "Desconhecido",
+        whatsapp: user.whatsapp || "Desconhecido"
+      },
 
       createdAt: new Date()
     });
