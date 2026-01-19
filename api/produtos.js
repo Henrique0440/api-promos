@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       userName: user.name || "Usuário",
       createdBy: {
         name: user.name || "Desconhecido",
-        whatsapp: user.whatsapp || "Desconhecido"
+        whatsapp: user.userId || "Desconhecido"
       },
 
       createdAt: new Date()
@@ -127,3 +127,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
+
