@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   // 🔹 LISTAR PRODUTOS
   if (req.method === "GET") {
     const data = await produtos
-      .find({ userId: user._id })
+      .find({ userId: user.userId})
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -59,9 +59,8 @@ export default async function handler(req, res) {
       link,
       imagem: imagem || null,
 
-      userId: user._id,
+      userId: user.userId,
       userName: user.name || "Usuário",
-      
       createdBy: {
         name: user.name || "Desconhecido",
         whatsapp: user.whatsapp || "Desconhecido"
@@ -91,7 +90,7 @@ export default async function handler(req, res) {
     if (imagem !== undefined) update.imagem = imagem;
 
     const result = await produtos.updateOne(
-      { _id: new ObjectId(id), userId: user._id },
+      { _id: new ObjectId(id), userId: user.userId },
       { $set: update }
     );
 
@@ -114,7 +113,7 @@ export default async function handler(req, res) {
 
     const result = await produtos.deleteOne({
       _id: new ObjectId(id),
-      userId: user._id
+      userId: user.userId
     });
 
     if (!result.deletedCount) {
