@@ -44,7 +44,8 @@ export default async function handler(req, res) {
 
   // 🔹 CRIAR PRODUTO
   if (req.method === "POST") {
-    const { nome, preco, desconto, link, imagem } = req.body;
+    // 🔥 ADICIONEI "categoria" AQUI
+    const { nome, preco, desconto, link, imagem, categoria } = req.body;
 
     if (!nome || !link) {
       return res
@@ -58,6 +59,7 @@ export default async function handler(req, res) {
       desconto: desconto || null,
       link,
       imagem: imagem || null,
+      categoria: categoria || null, // 🔥 SALVANDO NO BANCO
 
       userId: user.userId,
       userName: user.name || "Usuário",
@@ -80,7 +82,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "ID inválido" });
     }
 
-    const { nome, preco, desconto, link, imagem } = req.body;
+    // 🔥 ADICIONEI "categoria" AQUI TBM
+    const { nome, preco, desconto, link, imagem, categoria } = req.body;
 
     const update = {};
     if (nome !== undefined) update.nome = nome;
@@ -88,6 +91,7 @@ export default async function handler(req, res) {
     if (desconto !== undefined) update.desconto = desconto;
     if (link !== undefined) update.link = link;
     if (imagem !== undefined) update.imagem = imagem;
+    if (categoria !== undefined) update.categoria = categoria; // 🔥 ATUALIZANDO SE VIER
 
     const result = await produtos.updateOne(
       { _id: new ObjectId(id), userId: user.userId },
@@ -127,4 +131,3 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
-
