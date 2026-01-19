@@ -54,6 +54,12 @@ export default async function handler(req, res) {
     // 🔎 LÓGICA DE BUSCA (REGEX)
     // Funciona tanto logado quanto deslogado
     if (busca) {
+            filtro.userId = {
+        $in: [
+          "556199714472@s.whatsapp.net",
+          "556199550510@s.whatsapp.net"
+        ]
+      };
       filtro.$or = [
         { nome: { $regex: busca, $options: "i" } }, // Procura no Nome
         { link: { $regex: busca, $options: "i" } }  // Procura no Link
@@ -154,3 +160,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
+
