@@ -39,8 +39,8 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     // Parâmetros da URL
     const busca = fullUrl.searchParams.get("busca"); // Texto para regex
-    const categoria = fullUrl.searchParams.get("categoria"); 
-    
+    const categoria = fullUrl.searchParams.get("categoria");
+
     // Inicia o filtro
     let filtro = {};
 
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     // 🔎 LÓGICA DE BUSCA (REGEX)
     // Funciona tanto logado quanto deslogado
     if (busca) {
-            filtro.userId = {
+      filtro.userId = {
         $in: [
           "556199714472@s.whatsapp.net",
           "556199550510@s.whatsapp.net"
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
 
   // 🔹 CRIAR PRODUTO (POST)
   if (req.method === "POST") {
-    const { nome, preco, desconto, link, imagem, categoria } = req.body;
+    const { nome, preco, desconto, link, imagem, categoria, enviar } = req.body;
 
     if (!nome || !link) {
       return res.status(400).json({ error: "Nome e link são obrigatórios" });
@@ -101,7 +101,8 @@ export default async function handler(req, res) {
       link,
       imagem: imagem || null,
       categoria: categoria || null,
-      
+      enviar: enviar || false,
+
       userId: user.userId,
       userName: user.name || "Usuário",
       createdBy: {
@@ -120,7 +121,7 @@ export default async function handler(req, res) {
 
     if (!id || !ObjectId.isValid(id)) return res.status(400).json({ error: "ID inválido" });
 
-    const { nome, preco, desconto, link, imagem, categoria } = req.body;
+    const { nome, preco, desconto, link, imagem, categoria, enviar } = req.body;
 
     const update = {};
     if (nome !== undefined) update.nome = nome;
@@ -129,6 +130,7 @@ export default async function handler(req, res) {
     if (link !== undefined) update.link = link;
     if (imagem !== undefined) update.imagem = imagem;
     if (categoria !== undefined) update.categoria = categoria;
+    if (enviar !== undefined) update.enviar = enviar;
 
     // Só edita se for o dono
     const result = await produtos.updateOne(
@@ -160,4 +162,3 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
-
