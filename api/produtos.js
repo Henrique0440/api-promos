@@ -88,7 +88,7 @@ export default async function handler(req, res) {
 
   // 🔹 CRIAR PRODUTO (POST)
   if (req.method === "POST") {
-    const { nome, preco, desconto, link, imagem, categoria, enviar } = req.body;
+    const { nome, preco, desconto, link, imagem, categoria, enviar, nomeShopee } = req.body;
 
     if (!nome || !link) {
       return res.status(400).json({ error: "Nome e link são obrigatórios" });
@@ -96,6 +96,7 @@ export default async function handler(req, res) {
 
     await produtos.insertOne({
       nome,
+      nomeShopee: nomeShopee || null,
       preco: preco || null,
       desconto: desconto || null,
       link,
@@ -121,7 +122,7 @@ export default async function handler(req, res) {
 
     if (!id || !ObjectId.isValid(id)) return res.status(400).json({ error: "ID inválido" });
 
-    const { nome, preco, desconto, link, imagem, categoria, enviar } = req.body;
+    const { nome, preco, desconto, link, imagem, categoria, enviar, nomeShopee } = req.body;
 
     const update = {};
     if (nome !== undefined) update.nome = nome;
@@ -131,6 +132,7 @@ export default async function handler(req, res) {
     if (imagem !== undefined) update.imagem = imagem;
     if (categoria !== undefined) update.categoria = categoria;
     if (enviar !== undefined) update.enviar = enviar;
+    if (nomeShopee == undefined) update.nomeShopee = nomeShopee;
 
     // Só edita se for o dono
     const result = await produtos.updateOne(
