@@ -132,7 +132,7 @@ export default async function handler(req, res) {
     if (imagem !== undefined) update.imagem = imagem;
     if (categoria !== undefined) update.categoria = categoria;
     if (enviar !== undefined) update.enviar = enviar;
-    if (nomeShopee == undefined) update.nomeShopee = nomeShopee;
+    if (nomeShopee !== undefined) update.nomeShopee = nomeShopee;
 
     // Só edita se for o dono
     const result = await produtos.updateOne(
@@ -164,3 +164,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
+
