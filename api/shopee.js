@@ -3,9 +3,8 @@ import crypto from "crypto";
 import { connectPernalongaBot } from "../scripts/database.js";
 
 // ✅ URL fixa (recomendado via env)
-const SHOPEE_API_URL = process.env.SHOPEE_API_URL;
-// ou se quiser hardcoded:
-// const SHOPEE_API_URL = "https://SUA_URL_FIXA_AQUI";
+const SHOPEE_API_URL = "https://open-api.affiliate.shopee.com.br/graphql";
+
 
 // 🔹 Authorization Shopee
 function gerarAuthorizationHeader(appId, secret, payload) {
@@ -134,3 +133,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
+
