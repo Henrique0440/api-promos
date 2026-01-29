@@ -2,9 +2,8 @@ import axios from "axios";
 import crypto from "crypto";
 import { connectPernalongaBot } from "../scripts/database.js";
 
-// ✅ URL fixa (recomendado via env)
+// ✅ URL fixa
 const SHOPEE_API_URL = "https://open-api.affiliate.shopee.com.br/graphql";
-
 
 // 🔹 Authorization Shopee
 function gerarAuthorizationHeader(appId, secret, payload) {
@@ -17,6 +16,7 @@ function gerarAuthorizationHeader(appId, secret, payload) {
   return `SHA256 Credential=${appId}, Timestamp=${timestamp}, Signature=${signature}`;
 }
 
+// 🔹 Query GraphQL
 function gerarPayload() {
   return {
     query: `
@@ -37,6 +37,27 @@ function gerarPayload() {
       }
     `,
   };
+}
+
+// ✅ Utils: formatar preço e montar texto "De | Por"
+function formatarBRL(valor) {
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function montarTextoPreco(precoAtual, desconto) {
+  const pa = Number(precoAtual ?? 0);
+  const d = Number(desconto ?? 0);
+
+  if (!pa || pa <= 0) return "";
+  if (!d || d <= 0 || d >= 100) return formatarBRL(pa);
+
+  const precoOriginal = pa / (1 - d / 100);
+  const originalArred = Math.round(precoOriginal * 100) / 100;
+
+  return `De: ~${formatarBRL(originalArred)}~ | Por: ${formatarBRL(pa)}`;
 }
 
 export default async function handler(req, res) {
@@ -65,7 +86,9 @@ export default async function handler(req, res) {
     const { appId, secret } = req.body || {};
 
     if (!appId || !secret) {
-      return res.status(400).json({ error: "Campos obrigatórios: appId, secret" });
+      return res
+        .status(400)
+        .json({ error: "Campos obrigatórios: appId, secret" });
     }
 
     await users.updateOne(
@@ -88,10 +111,6 @@ export default async function handler(req, res) {
   // GET: busca produtos (URL fixa + cred do user)
   // ============================================================
   if (req.method === "GET") {
-    if (!SHOPEE_API_URL) {
-      return res.status(500).json({ error: "SHOPEE_API_URL não configurada no ambiente" });
-    }
-
     const cred = user.shopeeCred;
 
     // ✅ agora só precisa de appId e secret
@@ -112,13 +131,22 @@ export default async function handler(req, res) {
 
       const nodes = response.data?.data?.productOfferV2?.nodes || [];
 
-      const produtos = nodes.map((p) => ({
-        nomeShopee: p.productName,
-        preco: String(p.price ?? ""),
-        desconto: p.priceDiscountRate,
-        imagem: p.imageUrl,
-        link: p.offerLink || p.productLink,
-      }));
+      const produtos = nodes.map((p) => {
+        const precoFormatado = montarTextoPreco(p.price, p.priceDiscountRate);
+        const descontoNum = Number(p.priceDiscountRate ?? 0);
+
+        return {
+          nomeShopee: p.productName,
+          preco: precoFormatado, // ✅ "De: ~R$...~ | Por: R$..."
+          desconto: `${descontoNum}%`,
+          imagem: p.imageUrl,
+          link: p.offerLink || p.productLink,
+
+          // 🔸 se quiser usar no front pra ordenar depois, descomenta:
+          // precoAtualNumero: Number(p.price ?? 0),
+          // descontoNumero: descontoNum,
+        };
+      });
 
       return res.status(200).json({ needsCred: false, produtos });
     } catch (err) {
@@ -133,4 +161,3 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
-
