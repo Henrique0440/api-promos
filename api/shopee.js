@@ -52,7 +52,7 @@ function montarTextoPreco(precoAtual, desconto) {
   const d = Number(desconto ?? 0);
 
   if (!pa || pa <= 0) return "";
-  if (!d || d <= 0 || d >= 100) return formatarBRL(pa);
+  if (!d || d <= 0 || d >= 100) return `Por apenas: ${formatarBRL(pa)}`;
 
   const precoOriginal = pa / (1 - d / 100);
   const originalArred = Math.round(precoOriginal * 100) / 100;
@@ -161,3 +161,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Método não permitido" });
 }
+
